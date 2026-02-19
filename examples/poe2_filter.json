@@ -1,0 +1,16 @@
+{
+  "rarity": "Rare",
+  "item_class": "Quarterstaves",
+  "min_item_level": 75,
+  "include_mods": [
+    "to Maximum Life",
+    "to Fire Resistance"
+  ],
+  "exclude_mods": [
+    "reduced Attack Speed"
+  ],
+  "stat_thresholds": {
+    "to_maximum_life": 80,
+    "to_fire_resistance": 30
+  }
+}
