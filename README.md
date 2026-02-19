@@ -1,54 +1,67 @@
-# PoE Crafting Assistant
+# PoE2 Crafting Assistant (Python Rewrite)
 
-**Update 8/24/2023: This repository is deprecated. You may be banned from PoE for using this tool. Clone and compile at your own risk**
+This repository has been rewritten as a **Python-first Path of Exile 2 helper**.
 
-A lightweight and intuitive crafting assistant for Path of Exile. This tool was created to assist players with in-game tasks such as chaos spam. To do so, each time the player clicks an item in-game (with perhaps a chaos orb), the tool parses the item and conditionally plays a sound indicating that the item hit the filter created by the user. The tool can also prevent you from rolling-over an item by blocking your mouse.
+## What changed
 
-The Crafting Assistant comes with a UI to assist users in creating filters. This program is entirely standalone, and does not come with an installer. It runs off of a single .jar file, using resources that come in the downloaded folder. Currently it is only tested and functional on Windows 10. Support for  other platforms may come in the future.
+The original Java app targeted PoE1 and automated in-game behavior. This rewrite focuses on a safer, scriptable workflow for PoE2:
 
-![Image](https://i.imgur.com/QSLlMso.jpg)
+- Parse copied PoE2 item text into structured fields.
+- Evaluate items against JSON filters.
+- Return a simple **HIT/MISS** result with reasons.
 
-# Getting Started
+> This version intentionally avoids mouse/keyboard automation.
 
-## Download
-Go to the [releases page](https://github.com/CharlieBaird/PoECraftingAssistant/releases) and download the latest release. For instructions in setting up the tool, head over to [getting started](https://github.com/CharlieBaird/PoECraftingAssistant/wiki/1.-Getting-Started) in the [wiki](https://github.com/CharlieBaird/PoECraftingAssistant/wiki).
+## Quick start
 
-## Configuring Delay
-### **THIS IS AN EXTREMELY IMPORTANT STEP. THE TOOL WILL NOT WORK AS EXPECTED IF NOT ADJUSTED CORRECTLY TO YOUR IN-GAME PING.**
-### **IF THE TOOL SEEMS TO NOT BE DETECTING WHEN FILTERS HAVE HIT, IT IS MOST LIKELY BECAUSE THIS VALUE IS TOO LOW. ADJUST AND TEST BEFORE YOU TRUST IT WITH SPAMMING.**
+### 1) Run directly with Python
 
-Press F1 while in-game to view your ping to the server you are connected to. Alternatively, logout and it will show you your ping value in the login screen where it asks you to select a server.
+```bash
+python -m poe2_assistant.cli --item-file examples/poe2_item.txt --filter-file examples/poe2_filter.json
+```
 
-To adjust the delay, click the gear in the bottom right. *If you are mid-range, I would strongly suggest rounding up. The higher your ping is, the slower you must craft.*
-|   Ping In PoE: (ms)  	|           	| 10 	| 20 	| 30 	| 40 	| 50 	|  60 	|  80 	| 100 	| 120 	| 140 	| 200 	|
-|:----------------:	|:---------:	|:--:	|:--:	|:--:	|:--:	|:--:	|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|
-| Suggested Delay: (ms) 	|  Stable Internet:  	| 18 	| 27 	| 36 	| 48 	| 58 	|  72 	|  96 	| 120 	| 144 	| 192 	| 240 	|
-|                  	| Unstable Internet: 	| 27 	| 40 	| 54 	| 72 	| 87 	| 108 	| 144 	| 180 	| 216 	| 288 	| 360 	|
+### 2) Optional install as a CLI
 
-# Warnings
-- Make sure to use the tool while PoE is in either windowed or windowed-fullscreen mode.
-- Do not click your mouse as fast as you can; the tool will not work if you click too fast. The lower your ping, the faster you can click. Do not report an issue that the tool isn't working when you are clicking 20 times a second.
+```bash
+pip install -e .
+poe2-assistant --item-file examples/poe2_item.txt --filter-file examples/poe2_filter.json
+```
 
-# Frequently Asked Questions
+## Filter format
 
-#### How do I create an "or" logic gate?
-To create an "or" gate, you can create a subfilter in the GUI. To do so, click the white plus button on the left side of the screen to the right of your created filter. The tool will play the sound if the item hits **any** of the created subfilters.
+Example filter (`examples/poe2_filter.json`):
 
-#### Is this perfect?
-No, it's not perfect. Error comes from network instability. For example, the tool will try to parse the item when the Path of Exile server has not responded yet, resulting in the same item being parsed twice. This error is being worked on. The tool also does not quite have every single modifier in the game.
+```json
+{
+  "rarity": "Rare",
+  "item_class": "Quarterstaves",
+  "min_item_level": 75,
+  "include_mods": ["to Maximum Life"],
+  "exclude_mods": ["reduced Attack Speed"],
+  "stat_thresholds": {
+    "to_maximum_life": 80
+  }
+}
+```
 
-#### Can I move the folder?
-Yes, the tool is entirely stand-alone. However, the .jar and the "src" folder **must** remain in the same directory.
+### Supported keys
 
-# Roadmap
-- Item level config
+- `rarity` (exact match, case-insensitive)
+- `item_class` (exact match, case-insensitive)
+- `min_item_level` (numeric minimum)
+- `include_mods` (all substrings must appear in parsed mods)
+- `exclude_mods` (none of the substrings may appear)
+- `stat_thresholds` (normalized stat-name to minimum numeric value)
 
-## Demo Video
-https://youtu.be/3w9q7ZIyEKU
+## Development
 
-# Bug reports
-If you find a bug, please create an [issue thread](https://github.com/CharlieBaird/PoECraftingAssistant/issues/new). I will try to get back to you as soon as possible.
+Run tests:
 
-# Feature requests
-Please feel free to send in any feature requests you may have via an [issue thread](https://github.com/CharlieBaird/PoECraftingAssistant/issues/new) as well.
+```bash
+python -m pytest
+```
 
+## Notes
+
+- PoE2 item text formats are evolving. The parser is intentionally permissive so you can adapt filter logic quickly.
+- If you want, the next step can be adding a small desktop UI (PySide/Tkinter) on top of this core.

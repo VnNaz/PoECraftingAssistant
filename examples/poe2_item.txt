@@ -1,0 +1,10 @@
+Item Class: Quarterstaves
+Rarity: Rare
+Doom Reed
+Ironwood Quarterstaff
+--------
+Item Level: 78
+--------
++95 to Maximum Life
++34% to Fire Resistance
+18% increased Physical Damage
